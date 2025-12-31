@@ -7,32 +7,33 @@ import Footer from "@/components/footer";
 <meta name="robots" content="noindex, nofollow" data-whatsapp-url="true" />
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://toryskateshopecu.com'),
   title: {
-    default: 'Shop | Calzado y ropa Premium en Colombia',
-    template: '%s | Isla 420'
+    default: 'Tory Skateshop Ecuador | Skate, Streetwear y Accesorios',
+    template: '%s | Tory Skateshop Ecuador'
   },
-  description: 'Encuentra los sneakers más exclusivos y cómodos. viste premium para hombre y mujer con envíos a todo Colombia.',
-  keywords: ['sneakers', 'zapatillas premium', 'calzado deportivo', 'moda urbana', 'Colombia'],
+  description: 'Tory Skateshop Ecuador - Tu tienda de skate en Ecuador. Encuentra tablas, zapatillas, ropa streetwear y accesorios para skateboarding. Envíos a todo Ecuador.',
+  keywords: ['tory skateshop', 'skateshop ecuador', 'skate ecuador', 'tablas skate ecuador', 'zapatillas skate', 'streetwear ecuador', 'skateboarding ecuador', 'tory skate', 'skate shop', 'accesorios skate'],
   icons: {
-    icon: '/vercel.svg',  // Ruta a tu SVG en la carpeta public
-    shortcut: '/vercel.svg',  // Fallback PNG
-    apple: '/apple-touch-icon.png',  // Para dispositivos Apple
+    icon: '/logo-tory-ecu.jpg',
+    shortcut: '/logo-tory-ecu.jpg',
+    apple: '/logo-tory-ecu.jpg',
   },
   openGraph: {
     type: 'website',
-    locale: 'es_CO',
-    url: '',
-    siteName: 'Ritzi Sneakers',
+    locale: 'es_EC',
+    url: 'https://toryskateshopecu.com',
+    siteName: 'Tory Skateshop Ecuador',
     images: [{
-      url: '/logo.png',
+      url: '/logo-tory-ecu.jpg',
       width: 1200,
       height: 630,
-      alt: 'Nomada screenshop - Viste Premium'
+      alt: 'Tory Skateshop Ecuador - Skate y Streetwear'
     }]
   },
   twitter: {
     card: 'summary_large_image',
-    creator: '@nomada'
+    creator: '@toryskateshopecu'
   },
   robots: {
     index: true,
@@ -61,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
