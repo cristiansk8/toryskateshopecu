@@ -338,7 +338,7 @@ export default function HeroCarousel() {
         {/* Link para ver más */}
         <div className="mt-3 md:mt-4">
           <Link
-            href="/tienda?categoria=20"
+            href="/?categoria=20"
             className="w-full block px-3 md:px-4 py-2 md:py-3 bg-red-600/90 backdrop-blur-sm rounded-full shadow-lg border border-red-500/20 hover:bg-red-600 hover:scale-105 transition-all duration-300 font-bold text-center text-white text-xs md:text-sm"
           >
             Ver todos los Vans →

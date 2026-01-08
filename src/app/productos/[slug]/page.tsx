@@ -231,7 +231,7 @@ export default function ProductPage(props: Props) {
                 {product.categories.map((category: { id: number; name: string }) => (
                   <Link
                     key={category.id}
-                    href={`/tienda?categoria=${category.id}`}
+                    href={`/?categoria=${category.id}`}
                     className="inline-block mr-2 text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
                   >
                     {category.name}
