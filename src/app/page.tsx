@@ -7,12 +7,12 @@ import { getAjustedPrice } from '@/utils/price';
 import { formatPrice } from "@/utils/miles";
 
 export const metadata: Metadata = {
-  title: 'Inicio | Shop - Viste Premium en Colombia',
-  description: 'Descubre nuestra colección exclusiva de sneakers para hombre y mujer. Envíos a todo Colombia.',
+  title: 'Inicio | Shop - Viste Premium en Ecuador',
+  description: 'Descubre nuestra colección exclusiva de sneakers para hombre y mujer. Envíos a todo Ecuador.',
   alternates: {
     canonical: '',
   },
-  keywords: ['sneakers exclusivos', 'zapatillas premium Colombia', 'calzado deportivo de lujo'],
+  keywords: ['sneakers exclusivos', 'zapatillas premium Ecuador', 'calzado deportivo de lujo'],
 };
 
 interface Category {
