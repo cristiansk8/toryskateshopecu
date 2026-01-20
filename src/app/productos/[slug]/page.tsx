@@ -2,12 +2,13 @@
 
 import { getProductBySlug } from '@/app/actions/product/get-product.action';
 import Image from 'next/image';
-import { getAjustedPrice } from '@/utils/price';
 import { formatPrice } from '@/utils/miles';
 import { useEffect, useState } from 'react';
 import { Product } from '@/app/types';
 import Link from 'next/link';
 import api from '@/lib/woocommerce';
+import { ProductPrice } from '@/components/ProductPrice';
+import { ProductCard } from '@/components/ProductCard';
 
 
 // Prop types para Next.js 15
@@ -22,6 +23,7 @@ export default function ProductPage(props: Props) {
   const [userPhone, setUserPhone] = useState<string>('3022484816'); // número por defecto
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [formattedPrice, setFormattedPrice] = useState<string>('$0.00');
 
   useEffect(() => {
     const initPage = async () => {
@@ -33,6 +35,15 @@ export default function ProductPage(props: Props) {
         // Obtener el producto
         const productData = await getProductBySlug(params.slug);
         setProduct(productData);
+
+        // Calcular y formatear el precio para WhatsApp
+        if (productData) {
+          const priceToUse = productData.on_sale && productData.sale_price && productData.sale_price !== "0"
+            ? productData.sale_price
+            : productData.price;
+          const formatted = await formatPrice(priceToUse);
+          setFormattedPrice(formatted);
+        }
 
         // Obtener productos relacionados si el producto tiene categorías
         if (productData && productData.categories && productData.categories.length > 0) {
@@ -135,22 +146,6 @@ export default function ProductPage(props: Props) {
     );
   }
 
-  // --- FUNCIÓN DE FORMATO DE PRECIO MEJORADA ---
-  // Esta función asegura que se usen puntos para los miles y 2 decimales.
-  const formatPriceWithDots = (price: number | string | undefined | null): string => {
-    const numericPrice = Number(price);
-    if (isNaN(numericPrice)) return '0.00';
-    // 'en-US' usa puntos como separador decimal y comas para miles.
-    return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(numericPrice);
-  };
-
-  // --- LÓGICA DE PRECIO CENTRALIZADA ---
-  // Calcular el precio final ajustado (precio fijo)
-  const finalPrice = getAjustedPrice();
-
   return (
     <div className="pt-20 sm:pt-24 pb-16 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -242,20 +237,13 @@ export default function ProductPage(props: Props) {
 
             {/* Price */}
             <div className="mb-6">
-              {product.on_sale && product.sale_price !== product.regular_price ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-red-600">
-                    <span className="text-green-600">$</span>{formatPriceWithDots(finalPrice)}
-                  </span>
-                  <span className="text-sm sm:text-base text-gray-500 line-through">
-                    <span className="text-gray-500">$</span>{formatPriceWithDots(getAjustedPrice())}
-                  </span>
-                </div>
-              ) : (
-                <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">
-                  <span className="text-green-600">$</span>{formatPriceWithDots(finalPrice)}
-                </span>
-              )}
+              <ProductPrice
+                price={product.price}
+                regularPrice={product.regular_price}
+                salePrice={product.sale_price}
+                onSale={product.on_sale && product.sale_price !== product.regular_price}
+                size="large"
+              />
             </div>
 
 
@@ -320,14 +308,9 @@ export default function ProductPage(props: Props) {
                 console.log("--- DEBUG BOTÓN WHATSAPP ---");
                 console.log("Valor de 'userPhone' al hacer clic:", userPhone);
                 console.log("Talla seleccionada:", selectedSize);
+                console.log("Precio formateado:", formattedPrice);
 
-                // --- CÁLCULO DEL PRECIO FINAL JUSTO AL HACER CLIC ---
-                const precioFinalParaMensaje = getAjustedPrice();
-                const precioFormateadoParaMensaje = formatPriceWithDots(precioFinalParaMensaje);
-                console.log("Valor del precio (ajustado y formateado) que se pasa a la URL de WhatsApp:", `$${precioFormateadoParaMensaje}`);
-                // ----------------------------------------------------
-
-                let message = `Hola! Me interesa el producto: ${product.name} - $${precioFormateadoParaMensaje}`;
+                let message = `Hola! Me interesa el producto: ${product.name} - ${formattedPrice}`;
                 if (selectedSize) {
                   message += `\nTalla: ${selectedSize}`;
                 }
@@ -368,48 +351,7 @@ export default function ProductPage(props: Props) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Productos relacionados</h2>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {relatedProducts.map((relatedProduct) => (
-                <Link
-                  key={relatedProduct.id}
-                  href={`/productos/${relatedProduct.slug}`}
-                  className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
-                >
-                  <div className="aspect-square relative overflow-hidden bg-gray-100 rounded-t-lg">
-                    {relatedProduct.images && relatedProduct.images.length > 0 ? (
-                      <Image
-                        src={relatedProduct.images[0].src}
-                        alt={relatedProduct.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-4xl">📦</span>
-                      </div>
-                    )}
-                    {relatedProduct.on_sale && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        OFERTA
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-medium text-gray-900 mb-2 group-hover:text-blue-600 text-sm line-clamp-2 transition-colors">
-                      {relatedProduct.name}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-gray-900">
-                        ${formatPrice(getAjustedPrice())}
-                      </span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        relatedProduct.stock_status === 'instock'
-                          ? 'text-green-700 bg-green-100'
-                          : 'text-red-700 bg-red-100'
-                      }`}>
-                        {relatedProduct.stock_status === 'instock' ? 'Disponible' : 'Agotado'}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
               ))}
             </div>
           </div>

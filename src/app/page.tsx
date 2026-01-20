@@ -2,9 +2,7 @@ import { Metadata } from "next";
 import { Product } from "@/app/types";
 import api from "@/lib/woocommerce";
 import Link from "next/link";
-import Image from "next/image";
-import { getAjustedPrice } from '@/utils/price';
-import { formatPrice } from "@/utils/miles";
+import { ProductCard } from "@/components/ProductCard";
 
 export const metadata: Metadata = {
   title: 'Inicio | Shop - Viste Premium en Ecuador',
@@ -38,11 +36,6 @@ async function getProducts(categoryId?: string, searchTerm?: string): Promise<Pr
     console.log('🔍 Obteniendo productos con parámetros:', params);
     const response = await api.get<Product[]>("products", params);
     console.log(`✅ Productos obtenidos: ${response.data?.length || 0}`);
-
-    // Mostrar el JSON completo del primer producto para debugging
-    if (response.data && response.data.length > 0) {
-      console.log('📦 PRODUCTO COMPLETO (primero):', JSON.stringify(response.data[0], null, 2));
-    }
 
     return response.data || [];
   } catch (error) {
@@ -157,62 +150,7 @@ export default async function Home({ searchParams }: PageProps) {
 
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           {products.map((product: Product) => (
-            <Link
-              key={product.id}
-              href={`/productos/${product.slug}`}
-              className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div className="aspect-square relative overflow-hidden bg-gray-100 rounded-t-lg">
-                {product.images && product.images.length > 0 ? (
-                  <Image
-                    src={product.images[0].src}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-4xl">📦</span>
-                  </div>
-                )}
-                {product.on_sale && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                    OFERTA
-                  </div>
-                )}
-              </div>
-
-              <div className="p-3 sm:p-4">
-                <h3 className="font-medium text-gray-900 mb-2 group-hover:text-blue-600 text-sm sm:text-base line-clamp-2">
-                  {product.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div>
-                    {product.on_sale && product.sale_price !== product.regular_price ? (
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
-                        <span className="text-base sm:text-lg font-bold text-red-600">
-                          ${formatPrice( getAjustedPrice())}
-                        </span>
-                        <span className="text-xs sm:text-sm text-gray-500 line-through">
-                          ${formatPrice( getAjustedPrice())}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-base sm:text-lg font-bold text-gray-900">
-                        ${formatPrice( getAjustedPrice())}
-                      </span>
-                    )}
-
-                  </div>
-                  <span className={`text-xs px-2 py-1 rounded-full ${product.stock_status === 'instock'
-                    ? 'text-green-700 bg-green-100'
-                    : 'text-red-700 bg-red-100'
-                    }`}>
-                    {product.stock_status === 'instock' ? 'Disponible' : 'Agotado'}
-                  </span>
-                </div>
-              </div>
-            </Link>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
